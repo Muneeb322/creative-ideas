@@ -4,6 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { ShoppingCart, Star } from "lucide-react";
 import { useCartStore } from "@/store/cart";
+import { useAuthStore } from "@/store/auth";
+import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
 interface ProductCardProps {
@@ -28,10 +30,17 @@ export default function ProductCard({
   category,
 }: ProductCardProps) {
   const addItem = useCartStore((s) => s.addItem);
+  const user = useAuthStore((s) => s.user);
+  const router = useRouter();
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     if (stock <= 0) return;
+    if (!user) {
+      toast.error("Please login to add items to cart");
+      router.push("/login");
+      return;
+    }
     addItem({ id, name, price, salePrice, image, slug, stock });
     toast.success(`${name} added to cart!`);
   };

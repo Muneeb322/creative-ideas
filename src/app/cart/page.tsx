@@ -1,17 +1,32 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Minus, Plus, Trash2, ShoppingBag, ArrowRight } from "lucide-react";
 import { useCartStore } from "@/store/cart";
 
 export default function CartPage() {
+  const [mounted, setMounted] = useState(false);
   const { items, removeItem, updateQuantity, getTotal, clearCart } =
     useCartStore();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const subtotal = getTotal();
   const shipping = subtotal >= 50 ? 0 : 5.99;
   const tax = subtotal * 0.08;
   const total = subtotal + shipping + tax;
+
+  if (!mounted) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 py-16 text-center">
+        <ShoppingBag size={64} className="mx-auto text-gray-300 mb-4 animate-pulse" />
+        <p className="text-gray-500">Loading cart...</p>
+      </div>
+    );
+  }
 
   if (items.length === 0) {
     return (
