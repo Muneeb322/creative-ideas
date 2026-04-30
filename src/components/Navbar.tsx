@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   ShoppingCart,
   User,
@@ -21,9 +21,14 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [mounted, setMounted] = useState(false);
   const itemCount = useCartStore((s) => s.getItemCount());
   const { user, setUser } = useAuthStore();
   const router = useRouter();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -84,14 +89,14 @@ export default function Navbar() {
               className="p-2 text-gray-600 hover:text-indigo-600 transition relative"
             >
               <ShoppingCart size={20} />
-              {itemCount > 0 && (
+              {mounted && itemCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-indigo-600 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
                   {itemCount}
                 </span>
               )}
             </Link>
 
-            {user ? (
+            {mounted && user ? (
               <div className="relative group">
                 <button className="p-2 text-gray-600 hover:text-indigo-600 transition flex items-center gap-1">
                   <User size={20} />
@@ -130,14 +135,14 @@ export default function Navbar() {
                   </button>
                 </div>
               </div>
-            ) : (
+            ) : !mounted || !user ? (
               <Link
                 href="/login"
                 className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition"
               >
                 Sign In
               </Link>
-            )}
+            ) : null}
           </div>
         </div>
       </div>

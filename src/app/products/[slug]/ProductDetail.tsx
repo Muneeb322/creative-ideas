@@ -13,6 +13,8 @@ import {
   MessageCircle,
 } from "lucide-react";
 import { useCartStore } from "@/store/cart";
+import { useAuthStore } from "@/store/auth";
+import { useRouter } from "next/navigation";
 import ProductCard from "@/components/ProductCard";
 import toast from "react-hot-toast";
 
@@ -59,6 +61,8 @@ export default function ProductDetail({
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
   const addItem = useCartStore((s) => s.addItem);
+  const user = useAuthStore((s) => s.user);
+  const router = useRouter();
 
   const avgRating =
     product.reviews.length > 0
@@ -67,6 +71,11 @@ export default function ProductDetail({
       : 0;
 
   const handleAddToCart = () => {
+    if (!user) {
+      toast.error("Please login to add items to cart");
+      router.push("/login");
+      return;
+    }
     addItem(
       {
         id: product.id,
